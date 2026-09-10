@@ -101,11 +101,9 @@ public sealed class BalanceChart : Control
             double y = Y((double)_samples[0].Balance);
             context.DrawLine(new Pen(SolidColorBrush.Parse("#BBCFF5"), 1.5,
                 new DashStyle(new[] { 5d, 5d }, 0)), new Point(left, y), new Point(right, y));
-            var caption = Text("Your next experiment starts here", Muted, 12);
-            context.DrawText(caption, new Point(left + (right - left - caption.Width) / 2, y + 16));
         }
-        context.DrawText(Text("START", Muted, 9), new Point(left, bottom + 13));
-        var end = Text(_samples.Count > 1 ? $"{last:0} ms" : "WORKER SNAPSHOTS", Muted, 9);
+        context.DrawText(Text("0 ms", Muted, 9), new Point(left, bottom + 13));
+        var end = Text(_samples.Count > 1 ? $"{last:0} ms" : "", Muted, 9);
         context.DrawText(end, new Point(right - end.Width, bottom + 13));
     }
 

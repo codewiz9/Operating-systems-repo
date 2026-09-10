@@ -26,9 +26,9 @@ should use Microsoft's Arm64 SDK.
 - **Overview:** choose a synchronization mode and run one experiment or five trials.
 - **Workers:** real started, waiting, working, and completed states from the simulation.
 - **Chart:** observed balances at worker completion, plus starting and final values.
-- **Run history:** inspect earlier runs from this window's session.
-- **Export session:** save CSV summary and event rows, including OS and .NET information.
-- **How it works:** definitions and limitations for the team demonstration.
+- **History:** inspect earlier runs from this window's session.
+- **Export CSV:** save summary and event rows, including OS and .NET information.
+- **Notes:** concise definitions and limitations.
 - **Scheduling:** clearly marked pending; the team's `priority_controler` is still empty.
 
 Runs are sequential at the experiment level because the existing account is static.

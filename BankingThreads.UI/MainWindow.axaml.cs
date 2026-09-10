@@ -43,7 +43,8 @@ public partial class MainWindow : Window
             if (!_running) return;
             e.Cancel = true;
             _closeAfterRun = true;
-            StatusText.Text = "Finishing the current experiment before closing…";
+            StatusText.Text = "Finishing this run before closing…";
+            StatusText.IsVisible = true;
         };
     }
 
@@ -66,7 +67,7 @@ public partial class MainWindow : Window
         HistoryNav.Classes.Set("selected", page == "history");
         PriorityNav.Classes.Set("selected", page == "priority");
         GuideNav.Classes.Set("selected", page == "guide");
-        BreadcrumbText.Text = page switch { "history" => "Run history", "priority" => "Scheduling", "guide" => "How it works", _ => "Overview" };
+        BreadcrumbText.Text = page switch { "history" => "History", "priority" => "Scheduling", "guide" => "Notes", _ => "Overview" };
     }
 
     private void SetMode(bool synchronized)
@@ -74,9 +75,6 @@ public partial class MainWindow : Window
         _synchronized = synchronized;
         SynchronizedButton.Classes.Set("selected", synchronized);
         UnsynchronizedButton.Classes.Set("selected", !synchronized);
-        ModeDescription.Text = synchronized
-            ? "One worker holds the account lock at a time. Execution order can still vary."
-            : "All five workers update the same account without a lock. Updates can overwrite one another.";
     }
 
     private void SetRunning(bool running)
@@ -85,10 +83,8 @@ public partial class MainWindow : Window
         RunButton.IsEnabled = RepeatButton.IsEnabled = !running;
         SynchronizedButton.IsEnabled = UnsynchronizedButton.IsEnabled = !running;
         HistoryItems.IsEnabled = !running;
-        RunProgress.IsVisible = running;
-        RunButtonText.Text = running ? "Running…" : "Run simulation";
-        ActivityState.Text = running ? "LIVE" : "COMPLETE";
-        LiveDot.Fill = Display.Brush(running ? "#20A38B" : "#BCC3D0");
+        RunButtonText.Text = running ? "Running…" : "Run";
+        if (running) StatusText.IsVisible = false;
     }
 
     private void ResetDashboard(int number)
@@ -96,16 +92,12 @@ public partial class MainWindow : Window
         _events.Clear();
         foreach (var worker in _workers) worker.SetPhase(null);
         EmptyActivity.IsVisible = true;
-        EventCountText.Text = "0 events";
         Chart.Reset(SimulationApi.StartingBalance);
         BalanceText.Text = Display.Money(SimulationApi.StartingBalance);
-        BalanceCaption.Text = "Starting balance";
-        BalanceDescription.Text = "Preparing a fresh account for this experiment.";
+        BalanceCaption.Text = "Balance";
         ReferenceText.Text = DifferenceText.Text = DurationText.Text = "—";
         DifferenceText.Foreground = Display.Brush("#222631");
-        RunBadgeText.Text = $"Run {number:00} · {(_synchronized ? "Synchronized" : "Unsynchronized")}";
-        RunBadge.Background = Display.Brush(_synchronized ? "#EDF3FF" : "#FBF3E6");
-        StatusText.Text = "Calculating the sequential reference…";
+        RunSummaryText.Text = $"Run {number} · {(_synchronized ? "Synchronized" : "Unsynchronized")}";
     }
 
     private async Task RunExperimentsAsync(int count)
@@ -120,7 +112,7 @@ public partial class MainWindow : Window
                 int number = _history.Count + 1;
                 int generation = ++_displayGeneration;
                 ResetDashboard(number);
-                if (count > 1) RunButtonText.Text = $"Trial {trial} of {count}…";
+                if (count > 1) RunButtonText.Text = $"{trial}/{count}…";
                 bool mode = _synchronized;
 
                 // Join() blocks the coordinator, not the UI. The original five threads still do the work.
@@ -145,9 +137,9 @@ public partial class MainWindow : Window
             foreach (var worker in _workers.Where(x => x.Phase != WorkerPhase.Completed))
                 worker.SetPhase(WorkerPhase.Failed);
             var cause = error is AggregateException aggregate ? aggregate.Flatten().InnerExceptions[0] : error;
-            StatusText.Text = $"Experiment could not complete: {cause.Message}";
-            BalanceDescription.Text = "This run was not added to history. You can try again.";
-            RunBadgeText.Text = "Run interrupted";
+            StatusText.Text = $"Run failed: {cause.Message}";
+            StatusText.IsVisible = true;
+            RunSummaryText.Text = "Run failed";
         }
         finally
         {
@@ -160,16 +152,13 @@ public partial class MainWindow : Window
     {
         _events.Add(new EventModel(entry));
         EmptyActivity.IsVisible = false;
-        EventCountText.Text = $"{_events.Count} events";
         _workers.First(x => x.Id == entry.Update.WorkerId).SetPhase(entry.Update.Phase);
         if (entry.Update.ObservedBalance is decimal balance)
         {
             Chart.AddSample(entry.Elapsed.TotalMilliseconds, balance);
             BalanceText.Text = Display.Money(balance);
-            BalanceCaption.Text = "Latest observed balance";
+            BalanceCaption.Text = "Observed balance";
         }
-        int completed = _workers.Count(x => x.Phase == WorkerPhase.Completed);
-        StatusText.Text = $"{completed} of 5 workers completed · events shown in reported order";
         ActivityScroll.ScrollToEnd();
     }
 
@@ -188,21 +177,15 @@ public partial class MainWindow : Window
         DifferenceText.Text = Display.Difference(result.ActualBalance - result.ReferenceBalance);
         DifferenceText.Foreground = Display.Brush("#64708A");
         DurationText.Text = record.Duration;
-        BalanceDescription.Text = result.Synchronized ? "All five workers finished with mutual exclusion." : "All five workers finished without the account lock.";
-        RunBadgeText.Text = $"Run {record.Number:00} · {record.Mode}";
-        RunBadge.Background = Display.Brush(result.Synchronized ? "#EDF3FF" : "#FBF3E6");
-        StatusText.Text = $"Run {record.Number:00} complete · 5 workers · 20 updates · {record.Duration}";
-        ActivityState.Text = "COMPLETE";
+        RunSummaryText.Text = $"Run {record.Number} · {record.Mode}";
         ActivityScroll.ScrollToHome();
     }
 
     private void UpdateHistory()
     {
-        HistoryCount.Text = _history.Count.ToString();
         EmptyHistory.IsVisible = _history.Count == 0;
         ExportButton.IsEnabled = _history.Count > 0;
-        int synchronized = _history.Count(x => x.Result.Synchronized);
-        SessionSummary.Text = $"{_history.Count} runs · {synchronized} synchronized · {_history.Count - synchronized} unsynchronized";
+        SessionSummary.Text = $"{_history.Count} {(_history.Count == 1 ? "run" : "runs")}";
     }
 
     private void OnViewRunClick(object? sender, RoutedEventArgs e)
@@ -222,7 +205,7 @@ public partial class MainWindow : Window
         {
             var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
             {
-                Title = "Export Ledger session",
+                Title = "Export CSV",
                 SuggestedFileName = $"ledger-session-{DateTime.Now:yyyyMMdd-HHmm}.csv",
                 DefaultExtension = "csv",
                 FileTypeChoices = new[] { new FilePickerFileType("CSV spreadsheet") { Patterns = new[] { "*.csv" } } },
@@ -236,11 +219,11 @@ public partial class MainWindow : Window
                 await using var writer = new StreamWriter(stream, new UTF8Encoding(true));
                 await writer.WriteAsync(SessionExport.CreateCsv(snapshot));
             }
-            NoticeText.Text = $"Exported {snapshot.Length} runs";
+            NoticeText.Text = "CSV saved";
         }
         catch (Exception error)
         {
-            NoticeText.Text = "Export did not complete";
+            NoticeText.Text = "Export failed";
             ToolTip.SetTip(NoticeText, error.Message);
         }
     }

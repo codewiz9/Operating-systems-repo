@@ -76,7 +76,15 @@ public sealed class EventModel
     public SimulationEvent Source { get; }
     public string Time => $"{Source.Elapsed.TotalMilliseconds:0} ms";
     public string Worker => WorkerModel.NameFor(Source.Update.WorkerId);
-    public string Detail => Source.Update.Detail;
+    public string Detail => Source.Update.Phase switch
+    {
+        WorkerPhase.Started => "Started",
+        WorkerPhase.Waiting => "Waiting for lock",
+        WorkerPhase.Working => Source.Update.Detail.Contains("without a lock")
+            ? "Updating without lock" : "Updating with lock",
+        WorkerPhase.Completed => "Finished",
+        _ => Source.Update.Detail
+    };
     public string Balance => Source.Update.ObservedBalance is decimal value ? Display.Money(value) : "—";
     public IBrush Dot => Display.Brush(Source.Update.Phase switch
     {
