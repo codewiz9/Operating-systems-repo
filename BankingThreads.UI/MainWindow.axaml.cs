@@ -48,6 +48,15 @@ public partial class MainWindow : Window
         };
     }
 
+    private void OnToggleSidebarClick(object? sender, RoutedEventArgs e)
+    {
+        Sidebar.IsVisible = !Sidebar.IsVisible;
+        WindowLayout.ColumnDefinitions[0].Width = new GridLength(Sidebar.IsVisible ? 188 : 0);
+        string label = Sidebar.IsVisible ? "Hide sidebar" : "Show sidebar";
+        ToolTip.SetTip(SidebarToggle, label);
+        Avalonia.Automation.AutomationProperties.SetName(SidebarToggle, label);
+    }
+
     private void OnOverviewClick(object? sender, RoutedEventArgs e) => ShowPage("overview");
     private void OnHistoryClick(object? sender, RoutedEventArgs e) => ShowPage("history");
     private void OnPriorityClick(object? sender, RoutedEventArgs e) => ShowPage("priority");

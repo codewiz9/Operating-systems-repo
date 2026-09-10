@@ -5,59 +5,61 @@
         x:Class="BankingThreads.UI.MainWindow"
         Title="Ledger"
         Width="1240" Height="900" MinWidth="1040" MinHeight="720"
-        Background="#F8F9FC" WindowStartupLocation="CenterScreen">
-    <Grid ColumnDefinitions="180,*">
-        <Border Background="#F0F2F7" BorderBrush="#E4E7EF" BorderThickness="0,0,1,0">
-            <Grid Margin="14,24,14,18" RowDefinitions="Auto,*,Auto">
-                <StackPanel Orientation="Horizontal" Spacing="9" Margin="10,0,0,28">
-                    <Border Width="28" Height="28" CornerRadius="8" Background="#3478F6">
-                        <PathIcon Width="17" Height="17" Foreground="White"
-                                  Data="M 3,3 L 3,18 L 17,18 L 17,14 L 7,14 L 7,3 Z M 10,3 L 10,10 L 17,10 L 17,6 L 14,6 L 14,3 Z" />
-                    </Border>
-                    <TextBlock Text="Ledger" FontSize="19" FontWeight="Medium" VerticalAlignment="Center" />
-                </StackPanel>
-                <StackPanel Grid.Row="1">
-                    <Button x:Name="OverviewNav" Classes="nav selected" Click="OnOverviewClick">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <PathIcon Width="14" Height="14" Data="M 2,2 H 9 V 9 H 2 Z M 13,2 H 20 V 9 H 13 Z M 2,13 H 9 V 20 H 2 Z M 13,13 H 20 V 20 H 13 Z" />
-                            <TextBlock Text="Overview" />
-                        </StackPanel>
-                    </Button>
-                    <Button x:Name="HistoryNav" Classes="nav" Click="OnHistoryClick">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <PathIcon Width="14" Height="14" Data="M 3,3 H 21 V 5 H 3 Z M 3,10 H 21 V 12 H 3 Z M 3,17 H 15 V 19 H 3 Z" />
-                            <TextBlock Text="History" />
-                        </StackPanel>
-                    </Button>
-                    <Button x:Name="PriorityNav" Classes="nav" Click="OnPriorityClick">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <PathIcon Width="14" Height="14" Data="M 3,13 H 7 V 21 H 3 Z M 10,7 H 14 V 21 H 10 Z M 17,2 H 21 V 21 H 17 Z" />
-                            <TextBlock Text="Scheduling" />
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-                <Button Grid.Row="2" x:Name="GuideNav" Classes="nav" Click="OnGuideClick" Content="Notes" />
-            </Grid>
+        Background="#FFFFFF" WindowStartupLocation="CenterScreen">
+    <Grid x:Name="WindowLayout" ColumnDefinitions="188,*">
+        <Border x:Name="Sidebar" Background="#F3F3F5" BorderBrush="#E5E5E7" BorderThickness="0,0,1,0">
+            <StackPanel Margin="12,16">
+                <Button x:Name="OverviewNav" Classes="nav selected" Click="OnOverviewClick">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Path Width="16" Height="16" Classes="navigationIcon" Data="M 2,2 H 6 V 6 H 2 Z M 10,2 H 14 V 6 H 10 Z M 2,10 H 6 V 14 H 2 Z M 10,10 H 14 V 14 H 10 Z" />
+                        <TextBlock Text="Overview" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="HistoryNav" Classes="nav" Click="OnHistoryClick">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Path Width="16" Height="16" Classes="navigationIcon" Data="M 3,4 A 6,6 0 1 1 2,10 M 1,1 V 5 H 5 M 8,4 V 8 L 11,10" />
+                        <TextBlock Text="History" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="PriorityNav" Classes="nav" Click="OnPriorityClick">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Path Width="16" Height="16" Classes="navigationIcon" Data="M 2,14 V 10 H 4 V 14 Z M 7,14 V 6 H 9 V 14 Z M 12,14 V 2 H 14 V 14 Z" />
+                        <TextBlock Text="Scheduling" />
+                    </StackPanel>
+                </Button>
+                <Border Height="1" Background="#DDDDDF" Margin="10,12" />
+                <Button x:Name="GuideNav" Classes="nav" Click="OnGuideClick">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Path Width="16" Height="16" Classes="navigationIcon" Data="M 3,1 H 13 V 15 H 3 Z M 5,5 H 11 M 5,8 H 11 M 5,11 H 9" />
+                        <TextBlock Text="Notes" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
         </Border>
 
         <Grid Grid.Column="1" RowDefinitions="56,*">
-            <Border Background="#FCFCFE" BorderBrush="#E9EBF2" BorderThickness="0,0,0,1" Padding="26,0">
-                <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
-                    <TextBlock x:Name="BreadcrumbText" Text="Overview" FontSize="14" FontWeight="Medium" VerticalAlignment="Center" />
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12">
+            <Border Background="#FCFCFC" BorderBrush="#E8E8EA" BorderThickness="0,0,0,1" Padding="20,0">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" VerticalAlignment="Center">
+                    <Button x:Name="SidebarToggle" Classes="toolbar" Click="OnToggleSidebarClick"
+                            ToolTip.Tip="Hide sidebar" AutomationProperties.Name="Hide sidebar" Padding="8">
+                        <Path Width="18" Height="16" Stroke="#636366" StrokeThickness="1.3"
+                              Data="M 2,1 H 16 Q 17,1 17,2 V 14 Q 17,15 16,15 H 2 Q 1,15 1,14 V 2 Q 1,1 2,1 Z M 6,1 V 15 M 3,5 H 4 M 3,8 H 4 M 3,11 H 4" />
+                    </Button>
+                    <TextBlock Grid.Column="1" x:Name="BreadcrumbText" Text="Overview" FontSize="14" FontWeight="Medium" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12">
                         <TextBlock x:Name="NoticeText" Classes="muted" FontSize="11" VerticalAlignment="Center" />
-                        <Button x:Name="ExportButton" Classes="secondary" Click="OnExportClick"
-                                IsEnabled="False" Padding="11,6" FontSize="12" Content="Export CSV"
+                        <Button x:Name="ExportButton" Classes="toolbar" Click="OnExportClick"
+                                IsEnabled="False" Padding="10,7" FontSize="12" Content="Export CSV"
                                 ToolTip.Tip="Save this session's results and events" />
                     </StackPanel>
                 </Grid>
             </Border>
 
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                <Grid Margin="26,24">
-                    <StackPanel x:Name="OverviewPage" Spacing="18">
+                <Grid Margin="28,24">
+                    <StackPanel x:Name="OverviewPage" Spacing="24">
                         <Grid ColumnDefinitions="*,Auto">
-                            <Border Background="#ECEEF4" CornerRadius="9" Padding="3" HorizontalAlignment="Left">
+                            <Border Background="#EEEEF0" CornerRadius="8" Padding="3" HorizontalAlignment="Left">
                                 <StackPanel Orientation="Horizontal">
                                     <Button x:Name="UnsynchronizedButton" Classes="segment" Content="Unsynchronized" Click="OnUnsynchronizedClick" />
                                     <Button x:Name="SynchronizedButton" Classes="segment selected" Content="Synchronized" Click="OnSynchronizedClick" />
@@ -71,7 +73,7 @@
                             </StackPanel>
                         </Grid>
 
-                        <Border Classes="card" Padding="22,18">
+                        <Border Padding="0,8,0,20" BorderBrush="#E8E8EA" BorderThickness="0,0,0,1">
                             <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="12">
                                 <Grid ColumnDefinitions="*,Auto">
                                     <TextBlock x:Name="BalanceCaption" Text="Balance" Classes="muted" FontSize="12" />
@@ -79,23 +81,23 @@
                                 </Grid>
                                 <Grid Grid.Row="1" ColumnDefinitions="0.8*,1.2*" ColumnSpacing="24">
                                     <StackPanel Spacing="18" VerticalAlignment="Center">
-                                        <TextBlock x:Name="BalanceText" Text="$2,000.00" FontSize="38" FontWeight="Medium" LetterSpacing="-1" />
+                                        <TextBlock x:Name="BalanceText" Text="$2,000.00" FontSize="40" FontWeight="Normal" LetterSpacing="-1" />
                                         <StackPanel Orientation="Horizontal" Spacing="12">
                                             <StackPanel Orientation="Horizontal" Spacing="5">
-                                                <Ellipse Width="5" Height="5" Fill="#3478F6" />
-                                                <TextBlock Text="Observed" FontSize="10" Classes="muted" />
+                                                <Ellipse Width="5" Height="5" Fill="#007AFF" />
+                                                <TextBlock Text="Observed" FontSize="11" Classes="muted" />
                                             </StackPanel>
                                             <StackPanel Orientation="Horizontal" Spacing="5">
                                                 <Rectangle Width="9" Height="1" Fill="#B7BDCA" />
-                                                <TextBlock Text="Reference" FontSize="10" Classes="muted" />
+                                                <TextBlock Text="Reference" FontSize="11" Classes="muted" />
                                             </StackPanel>
                                         </StackPanel>
                                     </StackPanel>
-                                    <controls:BalanceChart Grid.Column="1" x:Name="Chart" Height="132"
+                                    <controls:BalanceChart Grid.Column="1" x:Name="Chart" Height="148"
                                                            AutomationProperties.Name="Balance at worker completion"
                                                            ToolTip.Tip="Reported balances when workers finish" />
                                 </Grid>
-                                <Border Grid.Row="2" BorderBrush="#EFF0F5" BorderThickness="0,1,0,0" Padding="0,14,0,0">
+                                <Border Grid.Row="2" BorderBrush="#E8E8EA" BorderThickness="0,1,0,0" Padding="0,14,0,0">
                                     <Grid ColumnDefinitions="*,*,*,*">
                                         <StackPanel Spacing="6">
                                             <TextBlock Text="Starting" Classes="muted" FontSize="11" />
@@ -122,12 +124,12 @@
 
                         <StackPanel Spacing="10">
                             <TextBlock Text="Workers" Classes="section" />
+                            <Border Background="#F7F7F8" CornerRadius="10" Padding="6,14">
                             <ItemsControl x:Name="WorkerItems">
                                 <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="5" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="models:WorkerModel">
-                                        <Border Classes="card" Margin="0,0,8,0" Padding="14" CornerRadius="10"
-                                                BorderBrush="{Binding CardBorder}" ToolTip.Tip="{Binding Rate}">
+                                        <Border Padding="12,0" ToolTip.Tip="{Binding Rate}">
                                             <StackPanel Spacing="8">
                                                 <TextBlock Text="{Binding Title}" FontSize="12" TextTrimming="CharacterEllipsis" />
                                                 <TextBlock Text="{Binding Status}" Foreground="{Binding StatusBrush}" FontSize="11" />
@@ -136,12 +138,13 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
+                            </Border>
                         </StackPanel>
 
                         <Border Classes="card" ClipToBounds="True">
                             <Grid RowDefinitions="Auto,Auto,*">
                                 <TextBlock Text="Activity" Classes="section" Margin="18,14" />
-                                <Border Grid.Row="1" Background="#FAFBFD" BorderBrush="#EFF1F6" BorderThickness="0,1" Padding="18,9">
+                                <Border Grid.Row="1" Background="#F7F7F8" BorderBrush="#E8E8EA" BorderThickness="0,1" Padding="18,9">
                                     <Grid ColumnDefinitions="70,145,*,100">
                                         <TextBlock Text="Time" Classes="muted" FontSize="11" />
                                         <TextBlock Grid.Column="1" Text="Worker" Classes="muted" FontSize="11" />
@@ -156,7 +159,7 @@
                                         <ItemsControl x:Name="ActivityItems">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate x:DataType="models:EventModel">
-                                                    <Border BorderBrush="#F2F3F7" BorderThickness="0,0,0,1" Padding="18,10">
+                                                    <Border BorderBrush="#EEEEF0" BorderThickness="0,0,0,1" Padding="18,10">
                                                         <Grid ColumnDefinitions="70,145,*,100">
                                                             <TextBlock Text="{Binding Time}" FontSize="11" Classes="muted" />
                                                             <TextBlock Grid.Column="1" Text="{Binding Worker}" FontSize="11" />
@@ -192,12 +195,12 @@
                                 <ItemsControl x:Name="HistoryItems">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="models:RunRecord">
-                                            <Border BorderBrush="#EDF0F5" BorderThickness="0,0,0,1" Padding="0,14">
+                                            <Border BorderBrush="#E8E8EA" BorderThickness="0,0,0,1" Padding="0,14">
                                                 <Grid ColumnDefinitions="40,*,120,110,80,55" ColumnSpacing="8">
                                                     <TextBlock Text="{Binding NumberLabel}" Classes="muted" VerticalAlignment="Center" />
                                                     <StackPanel Grid.Column="1" Spacing="5">
                                                         <TextBlock Text="{Binding Mode}" FontSize="12" />
-                                                        <TextBlock Text="{Binding Time}" Classes="muted" FontSize="10" />
+                                                        <TextBlock Text="{Binding Time}" Classes="muted" FontSize="11" />
                                                     </StackPanel>
                                                     <TextBlock Grid.Column="2" Text="{Binding Balance}" FontSize="12" VerticalAlignment="Center" />
                                                     <TextBlock Grid.Column="3" Text="{Binding Difference}" FontSize="12" VerticalAlignment="Center" />

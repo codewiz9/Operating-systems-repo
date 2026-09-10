@@ -74,6 +74,15 @@ appearing in the next trial.
 XAML is the description of the screen; C# is what happens when the user interacts
 with it. Reuse a style when changing something common to many controls.
 
+The layout follows Apple's guidance for [sidebars](https://developer.apple.com/design/human-interface-guidelines/sidebars),
+[toolbars](https://developer.apple.com/design/human-interface-guidelines/toolbars),
+and [typography](https://developer.apple.com/design/human-interface-guidelines/typography):
+compact navigation with a hide/show control, a quiet toolbar, and a clear text hierarchy.
+The balance sits directly on the content surface; related workers share one group.
+Neutral backgrounds and darker secondary text keep the chart and primary action easy
+to find. The bundled Inter font keeps rendering consistent on Mac and Windows.
+These are Avalonia controls, not native macOS materials or Apple icon assets.
+
 ## What remains for the team
 
 The priority controller is still a placeholder. Its eventual API should return

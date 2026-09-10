@@ -14,8 +14,8 @@ public sealed class BalanceChart : Control
     private readonly List<(double Milliseconds, decimal Balance)> _samples = new();
     public decimal? Reference { get; private set; }
     public IReadOnlyList<(double Milliseconds, decimal Balance)> Samples => _samples;
-    private static readonly IBrush Blue = SolidColorBrush.Parse("#3478F6");
-    private static readonly IBrush Muted = SolidColorBrush.Parse("#9A9FAB");
+    private static readonly IBrush Blue = SolidColorBrush.Parse("#007AFF");
+    private static readonly IBrush Muted = SolidColorBrush.Parse("#6E6E73");
 
     public void Reset(decimal starting)
     {
@@ -56,7 +56,7 @@ public sealed class BalanceChart : Control
         {
             double value = minimum + (maximum - minimum) * i / 3;
             double y = Y(value);
-            context.DrawLine(new Pen(SolidColorBrush.Parse("#EEF0F5"), 1), new Point(left, y), new Point(right, y));
+            context.DrawLine(new Pen(SolidColorBrush.Parse("#EEEEF0"), 1), new Point(left, y), new Point(right, y));
             context.DrawText(Text(value.ToString("N0", CultureInfo.InvariantCulture), Muted), new Point(right + 10, y - 6));
         }
         if (Reference is decimal baseline)
@@ -79,8 +79,8 @@ public sealed class BalanceChart : Control
                 EndPoint = new RelativePoint(0, 1, RelativeUnit.Relative),
                 GradientStops = new GradientStops
                 {
-                    new GradientStop(Color.Parse("#303478F6"), 0),
-                    new GradientStop(Color.Parse("#023478F6"), 1)
+                    new GradientStop(Color.Parse("#18007AFF"), 0),
+                    new GradientStop(Color.Parse("#00007AFF"), 1)
                 }
             };
             context.DrawGeometry(gradient, null, fill);
@@ -93,7 +93,7 @@ public sealed class BalanceChart : Control
             }
             context.DrawGeometry(null, new Pen(Blue, 2.5), line);
             Point endpoint = Position(_samples[^1]);
-            context.DrawEllipse(new SolidColorBrush(Color.Parse("#203478F6")), null, endpoint, 9, 9);
+            context.DrawEllipse(new SolidColorBrush(Color.Parse("#18007AFF")), null, endpoint, 9, 9);
             context.DrawEllipse(Brushes.White, new Pen(Blue, 2), endpoint, 4, 4);
         }
         else
@@ -102,11 +102,11 @@ public sealed class BalanceChart : Control
             context.DrawLine(new Pen(SolidColorBrush.Parse("#BBCFF5"), 1.5,
                 new DashStyle(new[] { 5d, 5d }, 0)), new Point(left, y), new Point(right, y));
         }
-        context.DrawText(Text("0 ms", Muted, 9), new Point(left, bottom + 13));
-        var end = Text(_samples.Count > 1 ? $"{last:0} ms" : "", Muted, 9);
+        context.DrawText(Text("0 ms", Muted, 11), new Point(left, bottom + 13));
+        var end = Text(_samples.Count > 1 ? $"{last:0} ms" : "", Muted, 11);
         context.DrawText(end, new Point(right - end.Width, bottom + 13));
     }
 
-    private static FormattedText Text(string value, IBrush color, double size = 10) =>
+    private static FormattedText Text(string value, IBrush color, double size = 11) =>
         new(value, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface("fonts:Inter#Inter"), size, color);
 }

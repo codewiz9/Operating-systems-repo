@@ -52,6 +52,19 @@ internal static class CheckProgram
             Check(Control<ItemsControl>(window, "ActivityItems").ItemCount == sync.Events.Count, "Progress rows are not duplicated by queued callbacks");
             Capture(window, output, "02-synchronized.png");
 
+            double expandedChartWidth = Control<BalanceChart>(window, "Chart").Bounds.Width;
+            Click(window, "SidebarToggle");
+            Pump();
+            Check(!Control<Border>(window, "Sidebar").IsVisible, "Sidebar can be hidden");
+            Check(Control<BalanceChart>(window, "Chart").Bounds.Width > expandedChartWidth,
+                "Hiding navigation gives its space to the results");
+            Check(Control<TextBlock>(window, "BalanceText").Text == Display.Money(sync.ActualBalance),
+                "Changing the layout preserves the displayed experiment");
+            Capture(window, output, "08-sidebar-hidden.png");
+            Click(window, "SidebarToggle");
+            Pump();
+            Check(Control<Border>(window, "Sidebar").IsVisible, "Sidebar can be restored from the toolbar");
+
             Click(window, "UnsynchronizedButton");
             Click(window, "RunButton");
             WaitUntil(() => !window.IsRunning);
