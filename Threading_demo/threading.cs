@@ -1,6 +1,9 @@
 //the follwoing lines are used to import the necessary libraries for the program
 using System;
 using System.Threading;
+using System.Security.Cryptography;
+using System.Text;
+using System.Security.Principal;
 
 //the main class for the program
 //each function will have 5 threads except priority function which will have 3 threads
@@ -117,6 +120,61 @@ partial class Program
         }
  
         }
+
+        //priorty functions
+
+        //Highest priority function
+        protected static (decimal RemainingBalance, string TransactionHash) VerifySolvencyAndNonce(){
+
+            decimal current_balance = 5000.00m;
+            decimal withdrawal_amount = 1000.00m;
+
+
+            bool isSolvent = (current_balance - withdrawal_amount) > 0;
+            decimal new_balance = isSolvent ? Math.Round(current_balance - withdrawal_amount, 2) : current_balance;
+            
+            //create the hash for transaction
+            string rawData = $"tx_{new_balance}_{DateTime.UtcNow.Ticks}";
+            string hashHex;
+
+            using (var sha256 = SHA256.Create())
+            {
+                byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(rawData));
+                hashHex = Convert.ToHexString(bytes); // Or BitConverter.ToString(bytes).Replace("-", "") in older .NET
+            }
+
+            // Return both values as a tuple
+            return (new_balance, hashHex);
+        }
+    //Above-medium priority function
+    protected static void CalculateLoanAmortization(){
+        double principal = 250000.0;
+        double annualRate = 0.065;
+        double monthlyRate = annualRate / 12.0;
+        int months = 360;
+
+        // 10000 simulates a large cpu laod a bank would exsiprence
+        for (int i = 0; i < 10000; i++)
+        {
+            double numerator = monthlyRate * Math.Pow(1 + monthlyRate, months);
+            double denominator = Math.Pow(1 + monthlyRate, months) - 1;
+            double payment = principal * (numerator / denominator);
+        }
+    }
+
+    //Lowest priority function
+    protected static void LowPriorityTransactions(){
+        Random random = new Random();
+        decimal account_balance = 10000.00m;
+        decimal transaction_amount = random.Next(-5000, 5000);
+
+        for (int i = 0; i < 100000; i++) //simulate 100000 transactions of low importance
+        {
+            account_balance += transaction_amount;
+            Thread.Sleep(10); //simulate a small delay for a transaction
+        }
+    }
+
 
         //priorty controller
         protected static void priority_controler()
