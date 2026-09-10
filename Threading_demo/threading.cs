@@ -1,7 +1,6 @@
 //the follwoing lines are used to import the necessary libraries for the program
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 
 //the main class for the program
 //each function will have 5 threads except priority function which will have 3 threads
@@ -37,7 +36,7 @@ partial class Program
     }
 
     // run the 5 calculations sequentially on one thread, compare the result to multi-threaded
-    private static decimal expected_balance()
+    protected static decimal expected_balance()
     {
         shared_balance = starting_balance;
         compute_interest();
