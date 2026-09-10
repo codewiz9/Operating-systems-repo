@@ -5,14 +5,30 @@ using System.Threading.Tasks;
 
 //the main class for the program
 //each function will have 5 threads except priority function which will have 3 threads
-class Program
+partial class Program
 {
     private static readonly object _ledgerLock = new object(); // read only lock for the ledger aka this cotnrols sync
     protected static decimal shared_balance = 2000.00m;
 
     //main function
     protected static void Main(string[] args){
-       
+
+        
+        Console.WriteLine($"starting balance: {shared_balance:C}");
+
+        // unsynced: 5 threads race on shared_balance with no lock, so the final total differs each run
+        for (int i = 1; i <= 5; i++)
+        {
+            Console.Write($"run {i}: ");
+            Sync_Controller(false);
+        }
+
+        // synced: each thread holds lock, so no updates are lost
+        for (int i = 1; i <= 5; i++)
+        {
+            Console.Write($"run {i}: ");
+            Sync_Controller(true);
+        }
     }
 
     //Computes I = P * r * t and adds the earned interest
@@ -85,9 +101,7 @@ class Program
         }
  
         }
-        //sync/unsync controler
-        protected static void sync_controler(bool use_lock){
-        }
+
         //priorty controler
         protected static void priority_controler(){
         }
