@@ -110,5 +110,5 @@ public sealed class BalanceChart : Control
     }
 
     private static FormattedText Text(string value, IBrush color, double size = 10) =>
-        new(value, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface("Inter"), size, color);
+        new(value, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface("fonts:Inter#Inter"), size, color);
 }

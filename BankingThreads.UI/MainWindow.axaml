@@ -80,6 +80,7 @@
                         <TextBlock x:Name="BreadcrumbText" Text="Overview" FontSize="11" />
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                        <TextBlock x:Name="NoticeText" FontSize="10" Foreground="#78849B" VerticalAlignment="Center" />
                         <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                             <Ellipse Width="5" Height="5" Fill="#62B79B" />
                             <TextBlock Text="Local simulation" Classes="muted" FontSize="10" />
@@ -94,7 +95,7 @@
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                 <Grid Margin="30,27,30,22">
                     <!-- Overview -->
-                    <StackPanel x:Name="OverviewPage" Spacing="20">
+                    <StackPanel x:Name="OverviewPage" Spacing="16">
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Spacing="7">
                                 <TextBlock Text="Every thread counts." FontSize="29" FontWeight="SemiBold" LetterSpacing="-0.8" />
@@ -106,8 +107,8 @@
                             </Border>
                         </Grid>
 
-                        <Border Classes="card" Padding="24,21">
-                            <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="16">
+                        <Border Classes="card" Padding="24,18">
+                            <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="12">
                                 <Grid ColumnDefinitions="*,Auto">
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <Border Background="#EDF3FF" CornerRadius="6" Width="25" Height="25">
@@ -122,7 +123,7 @@
                                     </Border>
                                 </Grid>
 
-                                <Grid Grid.Row="1" ColumnDefinitions="0.85*,1.3*" ColumnSpacing="24" MinHeight="166">
+                                <Grid Grid.Row="1" ColumnDefinitions="0.85*,1.3*" ColumnSpacing="24" MinHeight="130">
                                     <StackPanel VerticalAlignment="Center" Spacing="5">
                                         <TextBlock x:Name="BalanceCaption" Text="Starting balance" Classes="muted" FontSize="11" />
                                         <TextBlock x:Name="BalanceText" Text="$2,000.00" FontSize="43" FontWeight="SemiBold" LetterSpacing="-1.8" />
@@ -138,7 +139,7 @@
                                             </StackPanel>
                                         </StackPanel>
                                     </StackPanel>
-                                    <controls:BalanceChart Grid.Column="1" x:Name="Chart" Height="174"
+                                    <controls:BalanceChart Grid.Column="1" x:Name="Chart" Height="132"
                                                            AutomationProperties.Name="Observed balance at worker completion" />
                                 </Grid>
 
@@ -242,7 +243,7 @@
                                         <TextBlock Grid.Column="3" Text="OBSERVED BALANCE" Classes="eyebrow" FontSize="7" HorizontalAlignment="Right" />
                                     </Grid>
                                 </Border>
-                                <Grid Grid.Row="2" Height="178">
+                                <Grid Grid.Row="2" Height="130">
                                     <StackPanel x:Name="EmptyActivity" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
                                         <TextBlock Text="A clear view of every worker." FontSize="13" FontWeight="Medium" HorizontalAlignment="Center" />
                                         <TextBlock Text="Run a simulation to see thread activity appear here." FontSize="11" Classes="muted" />
@@ -288,7 +289,7 @@
                             <StackPanel Spacing="18">
                                 <Grid ColumnDefinitions="*,Auto">
                                     <TextBlock Text="This session" Classes="section" />
-                                    <TextBlock x:Name="SessionSummary" Text="No runs yet" Classes="muted" FontSize="11" />
+                                    <TextBlock Grid.Column="1" x:Name="SessionSummary" Text="No runs yet" Classes="muted" FontSize="11" VerticalAlignment="Center" />
                                 </Grid>
                                 <Border x:Name="EmptyHistory" Background="#F8FAFD" CornerRadius="10" Padding="30,55">
                                     <StackPanel HorizontalAlignment="Center" Spacing="12">
@@ -303,7 +304,7 @@
                                             <Border BorderBrush="#EDF0F5" BorderThickness="0,0,0,1" Padding="0,15">
                                                 <Grid ColumnDefinitions="40,*,135,115,80,65" ColumnSpacing="8">
                                                     <TextBlock Text="{Binding NumberLabel}" Foreground="#ABB2C0" VerticalAlignment="Center" />
-                                                    <StackPanel Spacing="5">
+                                                    <StackPanel Grid.Column="1" Spacing="5">
                                                         <TextBlock Text="{Binding Mode}" Foreground="{Binding ModeBrush}" FontWeight="Medium" FontSize="12" />
                                                         <TextBlock Text="{Binding Time}" Classes="muted" FontSize="10" />
                                                     </StackPanel>
