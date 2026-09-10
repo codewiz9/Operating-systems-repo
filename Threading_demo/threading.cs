@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 //each function will have 5 threads except priority function which will have 3 threads
 partial class Program
 {
-    private static readonly object _ledgerLock = new object(); // read only lock for the ledger aka this cotnrols sync
+    private static readonly object _ledgerLock = new object(); // Shared lock object; readonly prevents reassignment.
     protected static decimal shared_balance = 2000.00m;
 
     //main function
@@ -15,11 +15,11 @@ partial class Program
     {
         Console.WriteLine($"starting balance: {starting_balance:C}");
 
-        // the correct result: the same 5 calculations run one after another, single-threaded
+        // A fixed-order reference. Rounding can produce cents of variation in other valid orders.
         decimal expected = expected_balance();
         Console.WriteLine("\n=== UNSYNCHRONIZED RUN ===");
 
-        // unsynced: 5 threads race on shared_balance with no lock, so the final total differs each run
+        // Without a lock, updates may be lost. An individual run can still match the reference.
         for (int i = 1; i <= 5; i++)
         {
             decimal result = Sync_Controller(false);
@@ -89,7 +89,7 @@ partial class Program
            Thread.Sleep(30);
         }
     }
-    //Calculates a 10% tax on accrued profits and subtracts it
+    //Calculates a 10% tax on the current balance and subtracts it
     protected static void compute_tax(){
         //loop to make sure the threads run long enough to simulate concurent activity
         for (int i = 0; i <= 3; i++){
@@ -123,5 +123,4 @@ partial class Program
         protected static void priority_controler(){
         }
     }
-
 

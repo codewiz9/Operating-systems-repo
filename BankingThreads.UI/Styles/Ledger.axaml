@@ -1,0 +1,86 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style Selector="Window">
+        <Setter Property="FontFamily" Value="Inter" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Foreground" Value="#222631" />
+    </Style>
+    <Style Selector="TextBlock.muted"><Setter Property="Foreground" Value="#888E9B" /></Style>
+    <Style Selector="TextBlock.eyebrow">
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="LetterSpacing" Value="1.3" />
+        <Setter Property="Foreground" Value="#969CAA" />
+    </Style>
+    <Style Selector="TextBlock.section">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="Border.card">
+        <Setter Property="Background" Value="White" />
+        <Setter Property="BorderBrush" Value="#E8EBF1" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="16" />
+        <Setter Property="BoxShadow" Value="0 3 14 0 #050E1E43" />
+    </Style>
+    <Style Selector="Button">
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Padding" Value="14,9" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="Button:disabled"><Setter Property="Opacity" Value="0.48" /></Style>
+    <Style Selector="Button.primary">
+        <Setter Property="Background" Value="#3478F6" />
+        <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="Button.primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="#2468E6" />
+        <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="Button.primary:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="#195AD2" />
+    </Style>
+    <Style Selector="Button.secondary">
+        <Setter Property="Background" Value="White" />
+        <Setter Property="BorderBrush" Value="#E2E5ED" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="#596170" />
+    </Style>
+    <Style Selector="Button.nav">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="#717888" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Padding" Value="12,12" />
+        <Setter Property="Margin" Value="0,2" />
+    </Style>
+    <Style Selector="Button.nav.selected">
+        <Setter Property="Background" Value="White" />
+        <Setter Property="Foreground" Value="#3478F6" />
+    </Style>
+    <Style Selector="Button.nav:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="#E5E8F0" />
+    </Style>
+    <Style Selector="Button.segment">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="#7D8493" />
+        <Setter Property="Padding" Value="15,8" />
+        <Setter Property="CornerRadius" Value="7" />
+        <Setter Property="FontSize" Value="12" />
+    </Style>
+    <Style Selector="Button.segment.selected">
+        <Setter Property="Background" Value="White" />
+        <Setter Property="Foreground" Value="#303747" />
+    </Style>
+    <Style Selector="Button.segment:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="#F9FAFC" />
+    </Style>
+    <Style Selector="Button.link">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="#3478F6" />
+        <Setter Property="Padding" Value="6" />
+        <Setter Property="FontSize" Value="12" />
+    </Style>
+</Styles>

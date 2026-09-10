@@ -1,0 +1,404 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:models="using:BankingThreads.UI.Presentation"
+        xmlns:controls="using:BankingThreads.UI.Controls"
+        x:Class="BankingThreads.UI.MainWindow"
+        Title="Ledger — Banking concurrency lab"
+        Width="1320" Height="940" MinWidth="1080" MinHeight="740"
+        Background="#F8F9FC" WindowStartupLocation="CenterScreen">
+
+    <Grid ColumnDefinitions="214,*">
+        <!-- Sidebar. Native window decorations remain available on both operating systems. -->
+        <Border Background="#F0F2F7" BorderBrush="#E4E7EF" BorderThickness="0,0,1,0">
+            <Grid Margin="18,28,18,20" RowDefinitions="Auto,Auto,*,Auto">
+                <StackPanel Orientation="Horizontal" Spacing="11" Margin="8,0,0,38">
+                    <Border Width="36" Height="36" CornerRadius="11" Background="#3478F6">
+                        <PathIcon Width="21" Height="21" Foreground="White"
+                                  Data="M 3,3 L 3,18 L 17,18 L 17,14 L 7,14 L 7,3 Z M 10,3 L 10,10 L 17,10 L 17,6 L 14,6 L 14,3 Z" />
+                    </Border>
+                    <StackPanel VerticalAlignment="Center" Spacing="1">
+                        <TextBlock Text="Ledger" FontSize="21" FontWeight="SemiBold" LetterSpacing="-0.7" />
+                        <TextBlock Text="CONCURRENCY LAB" FontSize="8" Foreground="#969CAA" LetterSpacing="1.4" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1">
+                    <TextBlock Classes="eyebrow" Text="WORKSPACE" Margin="12,0,0,10" />
+                    <Button x:Name="OverviewNav" Classes="nav selected" Click="OnOverviewClick">
+                        <StackPanel Orientation="Horizontal" Spacing="11">
+                            <PathIcon Width="16" Height="16" Data="M 2,2 H 9 V 9 H 2 Z M 13,2 H 20 V 9 H 13 Z M 2,13 H 9 V 20 H 2 Z M 13,13 H 20 V 20 H 13 Z" />
+                            <TextBlock Text="Overview" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="HistoryNav" Classes="nav" Click="OnHistoryClick">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="11">
+                            <PathIcon Width="16" Height="16" Data="M 3,3 H 21 V 5 H 3 Z M 3,10 H 21 V 12 H 3 Z M 3,17 H 15 V 19 H 3 Z" />
+                            <TextBlock Grid.Column="1" Text="Run history" />
+                            <TextBlock Grid.Column="2" x:Name="HistoryCount" Text="0" FontSize="11" VerticalAlignment="Center" />
+                        </Grid>
+                    </Button>
+                    <Button x:Name="PriorityNav" Classes="nav" Click="OnPriorityClick">
+                        <StackPanel Orientation="Horizontal" Spacing="11">
+                            <PathIcon Width="16" Height="16" Data="M 3,13 H 7 V 21 H 3 Z M 10,7 H 14 V 21 H 10 Z M 17,2 H 21 V 21 H 17 Z" />
+                            <TextBlock Text="Scheduling" />
+                        </StackPanel>
+                    </Button>
+                    <TextBlock Classes="eyebrow" Text="LEARN" Margin="12,30,0,10" />
+                    <Button x:Name="GuideNav" Classes="nav" Click="OnGuideClick">
+                        <StackPanel Orientation="Horizontal" Spacing="11">
+                            <PathIcon Width="16" Height="16" Data="M 3,2 H 19 A 2,2 0 0 1 21,4 V 21 H 5 A 3,3 0 0 1 2,18 V 3 Z M 5,16 V 18 H 18 V 16 Z M 7,6 V 8 H 16 V 6 Z M 7,10 V 12 H 14 V 10 Z" />
+                            <TextBlock Text="How it works" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <StackPanel Grid.Row="3" Spacing="16">
+                    <Border CornerRadius="11" Background="#E7EBF4" Padding="13">
+                        <StackPanel Spacing="7">
+                            <TextBlock Text="A shared account." FontWeight="SemiBold" FontSize="12" />
+                            <TextBlock Text="Five independent workers.&#10;One very different outcome."
+                                       Foreground="#818A9C" FontSize="11" LineHeight="17" />
+                        </StackPanel>
+                    </Border>
+                    <Border BorderBrush="#DFE3EB" BorderThickness="0,1,0,0" Padding="8,16,0,0">
+                        <StackPanel Spacing="5">
+                            <TextBlock Text="COSC 335 · Project 1" FontWeight="Medium" FontSize="11" />
+                            <TextBlock x:Name="PlatformText" Classes="muted" FontSize="10" />
+                            <TextBlock Text="Demonstration target: Windows" Classes="muted" FontSize="10" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Column="1" RowDefinitions="62,*">
+            <Border Background="#FCFCFE" BorderBrush="#E9EBF2" BorderThickness="0,0,0,1" Padding="30,0">
+                <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                        <TextBlock Text="Workspace" Classes="muted" FontSize="11" />
+                        <TextBlock Text="/" Foreground="#CDD1DB" FontSize="11" />
+                        <TextBlock x:Name="BreadcrumbText" Text="Overview" FontSize="11" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <Ellipse Width="5" Height="5" Fill="#62B79B" />
+                            <TextBlock Text="Local simulation" Classes="muted" FontSize="10" />
+                        </StackPanel>
+                        <Button x:Name="ExportButton" Classes="secondary" Click="OnExportClick"
+                                IsEnabled="False" Padding="11,6" FontSize="11" Content="Export session ↗"
+                                ToolTip.Tip="Save run results, reported events, and environment details as CSV" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <Grid Margin="30,27,30,22">
+                    <!-- Overview -->
+                    <StackPanel x:Name="OverviewPage" Spacing="20">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Spacing="7">
+                                <TextBlock Text="Every thread counts." FontSize="29" FontWeight="SemiBold" LetterSpacing="-0.8" />
+                                <TextBlock Text="Explore what happens when five workers share one bank account."
+                                           Classes="muted" FontSize="12" />
+                            </StackPanel>
+                            <Border Grid.Column="1" Background="#EDF1F8" CornerRadius="6" Padding="9,5" VerticalAlignment="Top" Margin="0,6,0,0">
+                                <TextBlock Text="THREADS &amp; SYNCHRONIZATION" FontSize="8" Foreground="#8793AA" LetterSpacing="0.8" />
+                            </Border>
+                        </Grid>
+
+                        <Border Classes="card" Padding="24,21">
+                            <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="16">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <Border Background="#EDF3FF" CornerRadius="6" Width="25" Height="25">
+                                            <PathIcon Width="13" Height="13" Foreground="#3478F6"
+                                                      Data="M 2,7 L 12,1 L 22,7 V 9 H 2 Z M 4,11 H 7 V 19 H 4 Z M 10,11 H 13 V 19 H 10 Z M 17,11 H 20 V 19 H 17 Z M 2,21 H 22 V 23 H 2 Z" />
+                                        </Border>
+                                        <TextBlock Text="Shared account" FontWeight="Medium" FontSize="12" VerticalAlignment="Center" />
+                                        <TextBlock Text="•••• 0001" Classes="muted" FontSize="10" VerticalAlignment="Center" Margin="3,0,0,0" />
+                                    </StackPanel>
+                                    <Border Grid.Column="1" x:Name="RunBadge" Background="#EFF3FA" CornerRadius="12" Padding="9,4">
+                                        <TextBlock x:Name="RunBadgeText" Text="Ready to run" Foreground="#7D89A0" FontSize="10" />
+                                    </Border>
+                                </Grid>
+
+                                <Grid Grid.Row="1" ColumnDefinitions="0.85*,1.3*" ColumnSpacing="24" MinHeight="166">
+                                    <StackPanel VerticalAlignment="Center" Spacing="5">
+                                        <TextBlock x:Name="BalanceCaption" Text="Starting balance" Classes="muted" FontSize="11" />
+                                        <TextBlock x:Name="BalanceText" Text="$2,000.00" FontSize="43" FontWeight="SemiBold" LetterSpacing="-1.8" />
+                                        <TextBlock x:Name="BalanceDescription" Text="A fresh start for every experiment." Foreground="#8B93A3" FontSize="11" TextWrapping="Wrap" />
+                                        <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,11,0,0">
+                                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                                <Ellipse Width="5" Height="5" Fill="#3478F6" />
+                                                <TextBlock Text="Worker snapshots" FontSize="9" Classes="muted" />
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                                <Rectangle Width="9" Height="1" Fill="#B7BDCA" />
+                                                <TextBlock Text="Reference" FontSize="9" Classes="muted" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <controls:BalanceChart Grid.Column="1" x:Name="Chart" Height="174"
+                                                           AutomationProperties.Name="Observed balance at worker completion" />
+                                </Grid>
+
+                                <Border Grid.Row="2" BorderBrush="#EFF0F5" BorderThickness="0,1,0,0" Padding="0,16,0,0">
+                                    <Grid ColumnDefinitions="*,*,*,*">
+                                        <StackPanel Spacing="5">
+                                            <TextBlock Text="INITIAL BALANCE" Classes="eyebrow" FontSize="8" />
+                                            <TextBlock x:Name="InitialBalanceText" Text="$2,000.00" FontSize="14" FontWeight="Medium" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="5">
+                                            <TextBlock Text="SEQUENTIAL REFERENCE" Classes="eyebrow" FontSize="8" />
+                                            <TextBlock x:Name="ReferenceText" Text="—" FontSize="14" FontWeight="Medium" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2" Spacing="5">
+                                            <TextBlock Text="DIFFERENCE" Classes="eyebrow" FontSize="8" />
+                                            <TextBlock x:Name="DifferenceText" Text="—" FontSize="14" FontWeight="Medium" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="3" Spacing="5">
+                                            <TextBlock Text="WORKER DURATION" Classes="eyebrow" FontSize="8" />
+                                            <TextBlock x:Name="DurationText" Text="—" FontSize="14" FontWeight="Medium" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" RowSpacing="8">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <Border Background="#ECEEF4" CornerRadius="9" Padding="3">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button x:Name="UnsynchronizedButton" Classes="segment" Content="Unsynchronized" Click="OnUnsynchronizedClick" />
+                                        <Button x:Name="SynchronizedButton" Classes="segment selected" Content="Synchronized" Click="OnSynchronizedClick" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                <Button x:Name="RepeatButton" Classes="secondary" Content="Run 5 trials" Click="OnRepeatClick" FontSize="11" />
+                                <Button x:Name="RunButton" Classes="primary" Click="OnRunClick">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <PathIcon Width="10" Height="10" Data="M 3,1 L 15,9 L 3,17 Z" />
+                                        <TextBlock x:Name="RunButtonText" Text="Run simulation" FontSize="12" />
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                            <TextBlock Grid.Row="1" Grid.ColumnSpan="2" x:Name="ModeDescription"
+                                       Text="One worker holds the account lock at a time. Execution order can still vary."
+                                       Classes="muted" FontSize="10" TextWrapping="Wrap" Margin="2,0,0,0" />
+                        </Grid>
+
+                        <StackPanel Spacing="11">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Orientation="Horizontal" Spacing="9">
+                                    <TextBlock Text="The workers" Classes="section" />
+                                    <Border Background="#ECEFF5" CornerRadius="5" Padding="6,2">
+                                        <TextBlock Text="5" FontSize="10" Foreground="#8D95A6" />
+                                    </Border>
+                                </StackPanel>
+                                <TextBlock Grid.Column="1" Text="4 updates per worker" Classes="muted" FontSize="10" VerticalAlignment="Center" />
+                            </Grid>
+                            <ItemsControl x:Name="WorkerItems">
+                                <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="5" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="models:WorkerModel">
+                                        <Border Classes="card" Margin="0,0,8,0" Padding="13,14" CornerRadius="12" BorderBrush="{Binding CardBorder}">
+                                            <StackPanel Spacing="9">
+                                                <Grid ColumnDefinitions="*,Auto">
+                                                    <Border Width="27" Height="27" CornerRadius="8" Background="{Binding IconBackground}" HorizontalAlignment="Left">
+                                                        <TextBlock Text="{Binding Symbol}" Foreground="{Binding Accent}" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                    </Border>
+                                                    <TextBlock Grid.Column="1" Text="{Binding Rate}" FontSize="10" Foreground="{Binding Accent}" VerticalAlignment="Center" />
+                                                </Grid>
+                                                <TextBlock Text="{Binding Title}" FontSize="11" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                                                <StackPanel Orientation="Horizontal" Spacing="5">
+                                                    <Ellipse Width="4" Height="4" Fill="{Binding StatusBrush}" />
+                                                    <TextBlock Text="{Binding Status}" Foreground="{Binding StatusBrush}" FontSize="9" />
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+
+                        <Border Classes="card" Padding="0" ClipToBounds="True">
+                            <Grid RowDefinitions="Auto,Auto,*">
+                                <Grid Margin="19,15" ColumnDefinitions="*,Auto">
+                                    <StackPanel Orientation="Horizontal" Spacing="9">
+                                        <TextBlock Text="Activity" FontWeight="SemiBold" FontSize="13" />
+                                        <TextBlock x:Name="EventCountText" Text="0 events" Classes="muted" FontSize="10" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                        <Ellipse x:Name="LiveDot" Width="5" Height="5" Fill="#BCC3D0" />
+                                        <TextBlock x:Name="ActivityState" Text="READY" Classes="eyebrow" FontSize="8" />
+                                    </StackPanel>
+                                </Grid>
+                                <Border Grid.Row="1" Background="#FAFBFD" BorderBrush="#EFF1F6" BorderThickness="0,1" Padding="19,8">
+                                    <Grid ColumnDefinitions="70,140,*,100">
+                                        <TextBlock Text="ELAPSED" Classes="eyebrow" FontSize="8" />
+                                        <TextBlock Grid.Column="1" Text="WORKER" Classes="eyebrow" FontSize="8" />
+                                        <TextBlock Grid.Column="2" Text="EVENT" Classes="eyebrow" FontSize="8" />
+                                        <TextBlock Grid.Column="3" Text="OBSERVED BALANCE" Classes="eyebrow" FontSize="7" HorizontalAlignment="Right" />
+                                    </Grid>
+                                </Border>
+                                <Grid Grid.Row="2" Height="178">
+                                    <StackPanel x:Name="EmptyActivity" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                                        <TextBlock Text="A clear view of every worker." FontSize="13" FontWeight="Medium" HorizontalAlignment="Center" />
+                                        <TextBlock Text="Run a simulation to see thread activity appear here." FontSize="11" Classes="muted" />
+                                    </StackPanel>
+                                    <ScrollViewer x:Name="ActivityScroll" VerticalScrollBarVisibility="Auto">
+                                        <ItemsControl x:Name="ActivityItems">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="models:EventModel">
+                                                    <Border BorderBrush="#F2F3F7" BorderThickness="0,0,0,1" Padding="19,9">
+                                                        <Grid ColumnDefinitions="70,140,*,100">
+                                                            <TextBlock Text="{Binding Time}" FontSize="10" Foreground="#99A0AD" VerticalAlignment="Center" />
+                                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="7" VerticalAlignment="Center">
+                                                                <Ellipse Width="4" Height="4" Fill="{Binding Dot}" />
+                                                                <TextBlock Text="{Binding Worker}" FontSize="10" FontWeight="Medium" />
+                                                            </StackPanel>
+                                                            <TextBlock Grid.Column="2" Text="{Binding Detail}" FontSize="10" Foreground="#828A9A" TextWrapping="Wrap" VerticalAlignment="Center" />
+                                                            <TextBlock Grid.Column="3" Text="{Binding Balance}" FontSize="10" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Grid>
+                        </Border>
+
+                        <StackPanel Spacing="5">
+                            <TextBlock x:Name="StatusText" Text="Ready when you are." Foreground="#78849B" FontSize="10" />
+                            <TextBlock Text="Snapshots are reported observations. Rounding and execution order can affect the reference comparison."
+                                       Foreground="#A3A9B6" FontSize="9" TextWrapping="Wrap" />
+                            <ProgressBar x:Name="RunProgress" IsVisible="False" IsIndeterminate="True" Height="2" Margin="0,5,0,0" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- History -->
+                    <StackPanel x:Name="HistoryPage" IsVisible="False" Spacing="22">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="A record of every run." FontSize="29" FontWeight="SemiBold" LetterSpacing="-0.8" />
+                            <TextBlock Text="Compare outcomes, revisit the evidence, and export your session." Classes="muted" FontSize="12" />
+                        </StackPanel>
+                        <Border Classes="card" Padding="22">
+                            <StackPanel Spacing="18">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Text="This session" Classes="section" />
+                                    <TextBlock x:Name="SessionSummary" Text="No runs yet" Classes="muted" FontSize="11" />
+                                </Grid>
+                                <Border x:Name="EmptyHistory" Background="#F8FAFD" CornerRadius="10" Padding="30,55">
+                                    <StackPanel HorizontalAlignment="Center" Spacing="12">
+                                        <TextBlock Text="Your experiments belong here." FontSize="17" FontWeight="Medium" HorizontalAlignment="Center" />
+                                        <TextBlock Text="Start with a synchronized run, then try it without the lock." Classes="muted" FontSize="12" />
+                                        <Button Classes="primary" Content="Go to overview" HorizontalAlignment="Center" Click="OnOverviewClick" Margin="0,8,0,0" />
+                                    </StackPanel>
+                                </Border>
+                                <ItemsControl x:Name="HistoryItems">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="models:RunRecord">
+                                            <Border BorderBrush="#EDF0F5" BorderThickness="0,0,0,1" Padding="0,15">
+                                                <Grid ColumnDefinitions="40,*,135,115,80,65" ColumnSpacing="8">
+                                                    <TextBlock Text="{Binding NumberLabel}" Foreground="#ABB2C0" VerticalAlignment="Center" />
+                                                    <StackPanel Spacing="5">
+                                                        <TextBlock Text="{Binding Mode}" Foreground="{Binding ModeBrush}" FontWeight="Medium" FontSize="12" />
+                                                        <TextBlock Text="{Binding Time}" Classes="muted" FontSize="10" />
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="2" Spacing="5">
+                                                        <TextBlock Text="FINAL BALANCE" Classes="eyebrow" FontSize="7" />
+                                                        <TextBlock Text="{Binding Balance}" FontSize="13" FontWeight="Medium" />
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="3" Spacing="5">
+                                                        <TextBlock Text="VS. REFERENCE" Classes="eyebrow" FontSize="7" />
+                                                        <TextBlock Text="{Binding Difference}" FontSize="12" />
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Column="4" Text="{Binding Duration}" FontSize="10" Classes="muted" VerticalAlignment="Center" />
+                                                    <Button Grid.Column="5" Classes="link" Content="View ↗" Click="OnViewRunClick" VerticalAlignment="Center" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                        <TextBlock Text="History stays in this window's session. Export a CSV to keep results and event details."
+                                   Classes="muted" FontSize="11" TextWrapping="Wrap" />
+                    </StackPanel>
+
+                    <!-- Scheduling is honestly marked as pending rather than simulating priority data. -->
+                    <StackPanel x:Name="PriorityPage" IsVisible="False" Spacing="24">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Who gets the next turn?" FontSize="29" FontWeight="SemiBold" LetterSpacing="-0.8" />
+                            <TextBlock Text="A closer look at thread priority and the operating system's scheduler." Classes="muted" FontSize="12" />
+                        </StackPanel>
+                        <Border Classes="card" Padding="34">
+                            <StackPanel Spacing="20">
+                                <Border Background="#FFF5E7" CornerRadius="7" Padding="10,6" HorizontalAlignment="Left">
+                                    <TextBlock Text="AWAITING IMPLEMENTATION" Foreground="#B1843C" FontSize="9" LetterSpacing="1" />
+                                </Border>
+                                <TextBlock Text="The next experiment is on its way." FontSize="23" FontWeight="SemiBold" />
+                                <TextBlock Text="Your team's priority controller is still empty. Once it is implemented, this view can compare default and modified priorities using real measurements."
+                                           TextWrapping="Wrap" MaxWidth="620" HorizontalAlignment="Left" Foreground="#7E8798" LineHeight="22" />
+                                <Border Background="#F7F9FC" CornerRadius="10" Padding="20">
+                                    <StackPanel Spacing="13">
+                                        <TextBlock Text="What this experiment needs" FontWeight="SemiBold" />
+                                        <TextBlock Text="01    At least three workers with comparable calculation workloads." TextWrapping="Wrap" Foreground="#7E8798" />
+                                        <TextBlock Text="02    Default priorities, followed by supported modified priorities." TextWrapping="Wrap" Foreground="#7E8798" />
+                                        <TextBlock Text="03    Repeated Windows trials, with timing and observed behavior." TextWrapping="Wrap" Foreground="#7E8798" />
+                                    </StackPanel>
+                                </Border>
+                                <TextBlock Text="Priority does not guarantee execution or completion order." Foreground="#8A94A6" FontSize="12" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- A useful presentation guide, grounded in this project's implementation. -->
+                    <StackPanel x:Name="GuidePage" IsVisible="False" Spacing="22">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Small details. Big differences." FontSize="29" FontWeight="SemiBold" LetterSpacing="-0.8" />
+                            <TextBlock Text="A quick guide to what you're seeing, and what it actually proves." Classes="muted" FontSize="12" />
+                        </StackPanel>
+                        <Border Classes="card" Padding="26">
+                            <StackPanel Spacing="13">
+                                <TextBlock Text="01 / One account, five threads" Classes="section" />
+                                <TextBlock Text="Each experiment resets the shared account to $2,000. Interest, management fees, compound yield, tax, and cost-of-living adjustments each run on a separate thread. Each worker applies its calculation four times."
+                                           TextWrapping="Wrap" Foreground="#7E8798" LineHeight="22" />
+                                <TextBlock Text="The current tax calculation takes 10% of the entire balance per update, not just the profits." TextWrapping="Wrap" Foreground="#979EAC" FontSize="11" />
+                            </StackPanel>
+                        </Border>
+                        <Border Classes="card" Padding="26">
+                            <StackPanel Spacing="13">
+                                <TextBlock Text="02 / What the lock changes" Classes="section" />
+                                <TextBlock Text="Without synchronization, workers can read an outdated balance and overwrite one another's changes. With synchronization, a worker holds the account lock for its entire calculation, including all four updates and the demonstration pauses."
+                                           TextWrapping="Wrap" Foreground="#7E8798" LineHeight="22" />
+                                <TextBlock Text="The lock provides mutual exclusion. It does not promise which worker goes first, or make these protected calculations run in parallel."
+                                           TextWrapping="Wrap" Foreground="#979EAC" FontSize="11" />
+                            </StackPanel>
+                        </Border>
+                        <Border Classes="card" Padding="26">
+                            <StackPanel Spacing="13">
+                                <TextBlock Text="03 / Read the evidence carefully" Classes="section" />
+                                <TextBlock Text="The reference applies the five jobs in one fixed order. Rounding to cents means another valid order can produce a slightly different balance. A zero difference does not prove an unprotected run was safe, and a small difference alone does not prove an update was lost."
+                                           TextWrapping="Wrap" Foreground="#7E8798" LineHeight="22" />
+                                <TextBlock Text="The chart connects balances observed when workers finish. It is not a transaction-by-transaction audit. Event sequence is report order; logging itself can influence scheduling."
+                                           TextWrapping="Wrap" Foreground="#979EAC" FontSize="11" />
+                            </StackPanel>
+                        </Border>
+                        <Border Classes="card" Padding="26">
+                            <StackPanel Spacing="13">
+                                <TextBlock Text="04 / Prepare for your demonstration" Classes="section" />
+                                <TextBlock Text="Run both modes several times on Windows. Use Run history to revisit an experiment, and Export session to save balances, timings, worker events, and the runtime environment. Worker duration excludes the separate reference calculation."
+                                           TextWrapping="Wrap" Foreground="#7E8798" LineHeight="22" />
+                                <TextBlock Text="The current simulation uses 30 ms pauses after each update. They make overlap easier to observe; they are not a synchronization mechanism."
+                                           TextWrapping="Wrap" Foreground="#979EAC" FontSize="11" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Window>
