@@ -9,12 +9,13 @@ partial class Program
     // launches the 5 calculations from threading.cs, each on its own thread
     // use_lock == false -> UNSYNCHRONIZED, threads race, updates get lost
     // use_lock == true  -> SYNCHRONIZED, each thread holds the lock, no updates lost
-    protected static void Sync_Controller(bool use_lock)
+    // returns the final balance so the caller (Main, or a frontend) decides how to show it
+    protected static decimal Sync_Controller(bool use_lock)
     {
         // reset the shared money to a const starting point
         shared_balance = starting_balance;
 
-        // the 5 calculations as a list so one loop covers them all
+        // the 5 calculations, and a matching name for each thread
         Action[] calculations =
         {
             compute_interest,
@@ -23,42 +24,57 @@ partial class Program
             compute_tax,
             compute_cost_of_living_adjustment,
         };
+        string[] names =
+        {
+            "interest",
+            "management-fee",
+            "compound-yield",
+            "tax",
+            "cola",
+        };
 
         // one thread per calculation
         Thread[] workers = new Thread[calculations.Length];
         for (int i = 0; i < calculations.Length; i++)
         {
-            // each thread should captures its own calculation
+            // capture what method will be ran, and its name
             Action calculation = calculations[i];
+            string name = names[i];
 
-            workers[i] = new Thread(() =>
-            {
-                if (use_lock)
-                {
-                    // only one thread inside here at a time, the other 4 wait
-                    lock (_ledgerLock)
-                    {
-                        calculation();
-                    }
-                }
-                else
-                {
-                    // no lock, runs alongside the others
-                    calculation();
-                }
-            });
+            workers[i] = new Thread(() => run_one(calculation, use_lock));
+            workers[i].Name = name;
         }
 
-        // start them all running at once
+        // start all 5 at once, then wait for all 5
         foreach (Thread worker in workers)
             worker.Start();
-
-        // wait for all 5 to finish before reporting the final balance
         foreach (Thread worker in workers)
             worker.Join();
 
-        // report the balance, ternary operator used
-        string mode = use_lock ? "SYNCHRONIZED" : "UNSYNCHRONIZED";
-        Console.WriteLine($"[{mode}] final balance: {shared_balance:C}");
+        return shared_balance;
+    }
+
+    // runs one calculation on the current thread, optionally holding the ledger lock
+    private static void run_one(Action calculation, bool use_lock)
+    {
+        string me = Thread.CurrentThread.Name;
+
+        if (use_lock)
+        {
+            // threads queue here; only one is inside the lock at a time
+            lock (_ledgerLock)
+            {
+                Console.WriteLine($"  [{me}] has lock, started");
+                calculation();
+                Console.WriteLine($"  [{me}] finished, lock released (balance {shared_balance:C})");
+            }
+        }
+        else
+        {
+            // no lock 
+            Console.WriteLine($"  [{me}] started (no lock)");
+            calculation();
+            Console.WriteLine($"  [{me}] finished (balance {shared_balance:C})");
+        }
     }
 }

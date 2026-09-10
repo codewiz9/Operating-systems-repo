@@ -11,24 +11,41 @@ partial class Program
     protected static decimal shared_balance = 2000.00m;
 
     //main function
-    protected static void Main(string[] args){
+    protected static void Main(string[] args)
+    {
+        Console.WriteLine($"starting balance: {starting_balance:C}");
 
-        
-        Console.WriteLine($"starting balance: {shared_balance:C}");
+        // the correct result: the same 5 calculations run one after another, single-threaded
+        decimal expected = expected_balance();
+        Console.WriteLine("\n=== UNSYNCHRONIZED RUN ===");
 
         // unsynced: 5 threads race on shared_balance with no lock, so the final total differs each run
         for (int i = 1; i <= 5; i++)
         {
-            Console.Write($"run {i}: ");
-            Sync_Controller(false);
+            decimal result = Sync_Controller(false);
+            Console.WriteLine($"run {i}: expected {expected:C} | actual {result:C} | diff {result - expected:C}");
         }
 
+        Console.WriteLine("\n=== SYNCHRONIZED RUN ===");
+        
         // synced: each thread holds lock, so no updates are lost
         for (int i = 1; i <= 5; i++)
         {
-            Console.Write($"run {i}: ");
-            Sync_Controller(true);
+            decimal result = Sync_Controller(true);
+            Console.WriteLine($"run {i}: expected {expected:C} | actual {result:C} | diff {result - expected:C}");
         }
+    }
+
+    // run the 5 calculations sequentially on one thread, compare the result to multi-threaded
+    private static decimal expected_balance()
+    {
+        shared_balance = starting_balance;
+        compute_interest();
+        compute_management_fee();
+        compute_compound_yield();
+        compute_tax();
+        compute_cost_of_living_adjustment();
+        return shared_balance;
     }
 
     //Computes I = P * r * t and adds the earned interest
