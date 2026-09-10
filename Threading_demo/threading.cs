@@ -119,9 +119,51 @@ partial class Program
  
         }
 
-        //priorty controler
-        protected static void priority_controler(){
+        //priorty controller
+        protected static void priority_controler()
+    {
+        Action[] calculations =
+        {
+            compute_interest,
+            compute_management_fee,
+            compute_tax
+        };
+
+        string[] names =
+        {
+            "high-priority-interest",
+            "medium-priority-management-fee",
+            "low-priority-tax"
+        };
+
+        ThreadPriority[] priorities =
+        {
+            ThreadPriority.Highest,
+            ThreadPriority.Normal,
+            ThreadPriority.Lowest
+        };
+
+        Thread[] workers = new Thread[calculations.Length];
+
+        for(int i = 0; i < calculations.Length; i++)
+        {
+            int index = i; //Captures the current index for thread
+            workers[i] = new Thread(() =>
+            {
+                Console.WriteLine(
+                    $"[{Thread.CurrentThread.Name}] running at {Thread.CurrentThread.Priority}");
+                calculations[index]();
+            });
+
+            workers[i].Name = names[i];
+            workers[i].Priority = priorities[i];
         }
+        foreach (Thread worker in workers)
+            worker.Start();
+        
+        foreach (Thread worker in workers)
+            worker.Join();
     }
+}
 
 
