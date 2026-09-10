@@ -125,21 +125,27 @@ partial class Program
         Action[] calculations =
         {
             compute_interest,
+            compute_compound_yield,
             compute_management_fee,
-            compute_tax
+            compute_cost_of_living_adjustment,
+            compute_tax,
         };
 
         string[] names =
         {
             "high-priority-interest",
+            "above-medium-priority-compound-yield",
             "medium-priority-management-fee",
+            "below-medium-priority-cost-of-living-adjustment",
             "low-priority-tax"
         };
 
         ThreadPriority[] priorities =
         {
             ThreadPriority.Highest,
+            ThreadPriority.AboveNormal,
             ThreadPriority.Normal,
+            ThreadPriority.BelowNormal,
             ThreadPriority.Lowest
         };
 
