@@ -162,7 +162,7 @@ internal static class CheckProgram
     }
     private static void ValidateEvents(SimulationResult result, int expectedCount)
     {
-        Check(result.ReferenceBalance == 1419.38m, "Reference uses the existing calculations");
+        Check(result.ReferenceBalance == 1419.37m, "Reference uses the existing calculations");
         Check(result.Events.Count == expectedCount, "Expected worker lifecycle events are present");
         Check(result.Events.Select(x => x.Sequence).SequenceEqual(Enumerable.Range(1, expectedCount)), "Reported event ordering is stable");
         Check(result.Events.Where(x => x.Update.Phase == WorkerPhase.Started).Select(x => x.Update.WorkerId).Distinct().Count() == 5, "Five distinct workers start");

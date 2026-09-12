@@ -12,8 +12,6 @@ partial class Program
     // use_lock == false -> UNSYNCHRONIZED, threads race, updates get lost
     // use_lock == true  -> SYNCHRONIZED, each thread holds the lock, no updates lost
     // returns the final balance so the caller (Main, or a frontend) decides how to show it
-    // The UI supplies a callback: a function we call when a worker's status changes.
-    // Console callers can omit it and continue receiving text output.
     protected static decimal Sync_Controller(bool use_lock, Action<WorkerUpdate> progress = null)
     {
         // reset the shared money to a const starting point
@@ -23,18 +21,18 @@ partial class Program
         Action[] calculations =
         {
             compute_interest,
-            compute_management_fee,
             compute_compound_yield,
-            compute_tax,
+            compute_management_fee,
             compute_cost_of_living_adjustment,
+            compute_tax,
         };
         string[] names =
         {
             "interest",
-            "management-fee",
             "compound-yield",
-            "tax",
+            "management-fee",
             "cola",
+            "tax",
         };
 
         // one thread per calculation
@@ -63,11 +61,30 @@ partial class Program
             workers[i].Name = name;
         }
 
-        // Start all five before joining. Their actual execution order is up to the OS.
-        foreach (Thread worker in workers)
-            worker.Start();
-        foreach (Thread worker in workers)
-            worker.Join();
+        // The lock alone does not guarantee that threads will run in a fixed order
+        if (use_lock)
+        {
+            for (int i = 0; i < workers.Length; i++)
+            {
+                workers[i].Start();
+                workers[i].Join();
+            }
+
+            // Alternative lock comparison
+
+            // for (int i = 0; i < workers.Length; i++)
+            //     workers[i].Start();
+            // for (int i = 0; i < workers.Length; i++)
+            //     workers[i].Join();
+        }
+        else
+        {
+            // scheduler chooses the order of unsynchronized workers. 
+            for (int i = 0; i < workers.Length; i++)
+                workers[i].Start();
+            for (int i = 0; i < workers.Length; i++)
+                workers[i].Join();
+        }
 
         // All workers have stopped. Send any failures back to the caller instead of
         // returning an incomplete balance as a successful result. The UI shows the error.

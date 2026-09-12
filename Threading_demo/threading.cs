@@ -40,10 +40,10 @@ partial class Program
     {
         shared_balance = starting_balance;
         compute_interest();
-        compute_management_fee();
         compute_compound_yield();
-        compute_tax();
+        compute_management_fee();
         compute_cost_of_living_adjustment();
+        compute_tax();
         return shared_balance;
     }
 
