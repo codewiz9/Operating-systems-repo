@@ -74,7 +74,7 @@ public sealed class WorkerModel : INotifyPropertyChanged
 public sealed class EventModel
 {
     public SimulationEvent Source { get; }
-    public string Time => $"{Source.Elapsed.TotalMilliseconds:0} ms";
+    public string Time => $"{Source.Elapsed.TotalMilliseconds.ToString("F3", CultureInfo.InvariantCulture)} ms";
     public string Worker => WorkerModel.NameFor(Source.Update.WorkerId);
     public string Detail => Source.Update.Phase switch
     {
