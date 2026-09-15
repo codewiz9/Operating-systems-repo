@@ -146,11 +146,12 @@ partial class Program
             // Return both values as a tuple
             return (new_balance, hashHex);
         }
-    //Above-medium priority function
-    protected static void CalculateLoanAmortization(){
+    //Medium priority function
+    protected static int CalculateLoanAmortization(){
         double principal = 250000.0;
         double annualRate = 0.065;
         double monthlyRate = annualRate / 12.0;
+        int cpu_laod = 0;
         int months = 360;
 
         // 10000 simulates a large cpu laod a bank would exsiprence
@@ -159,7 +160,9 @@ partial class Program
             double numerator = monthlyRate * Math.Pow(1 + monthlyRate, months);
             double denominator = Math.Pow(1 + monthlyRate, months) - 1;
             double payment = principal * (numerator / denominator);
+            cpu_laod += 1;
         }
+        return cpu_laod;
     }
 
     //Lowest priority function
