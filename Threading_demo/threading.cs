@@ -166,16 +166,19 @@ partial class Program
     }
 
     //Lowest priority function
-    protected static void LowPriorityTransactions(){
+    protected static int LowPriorityTransactions(){
         Random random = new Random();
         decimal account_balance = 10000.00m;
-        decimal transaction_amount = random.Next(-5000, 5000);
+        int cpu_laod = 0;
 
         for (int i = 0; i < 100000; i++) //simulate 100000 transactions of low importance
         {
+            decimal transaction_amount = random.Next(-5000, 5000);
             account_balance += transaction_amount;
+            cpu_laod += 1;
             Thread.Sleep(10); //simulate a small delay for a transaction
         }
+        return cpu_laod;
     }
 
 
