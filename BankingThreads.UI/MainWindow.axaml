@@ -216,13 +216,100 @@
                         <TextBlock Text="Export to keep this session." Classes="muted" FontSize="11" />
                     </StackPanel>
 
-                    <StackPanel x:Name="PriorityPage" IsVisible="False">
-                        <Border Classes="card" Padding="24">
-                            <StackPanel Spacing="10">
-                                <TextBlock Text="Priority test" Classes="section" />
-                                <TextBlock Text="Not implemented." Classes="muted" FontSize="13" />
+                    <StackPanel x:Name="PriorityPage" IsVisible="False" Spacing="24">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Text="Priority workloads" Classes="section" VerticalAlignment="Center" />
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                <Button x:Name="PriorityModeButton" Classes="secondary" Content="Priority: On" Click="OnPriorityModeClick" FontSize="12"
+                                        ToolTip.Tip="Next run: on uses Highest, Normal, Lowest; off uses Normal for all three." />
+                                <Button x:Name="PriorityStopButton" Classes="secondary" Content="Stop" Click="OnPriorityStopClick" IsVisible="False" FontSize="12" />
+                                <Button x:Name="PriorityRunButton" Classes="primary" Click="OnPriorityRunClick" MinWidth="78">
+                                    <TextBlock x:Name="PriorityRunButtonText" Text="Run" FontSize="12" />
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+
+                        <Border BorderBrush="#E8E8EA" BorderThickness="0,0,0,1" Padding="0,4,0,20">
+                            <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="20">
+                                <StackPanel Spacing="8">
+                                    <TextBlock Text="Methods completed" Classes="muted" FontSize="11" />
+                                    <TextBlock x:Name="PriorityCompletedText" Text="0 / 3" FontSize="20" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Spacing="8">
+                                    <TextBlock Text="Elapsed" Classes="muted" FontSize="11" />
+                                    <TextBlock x:Name="PriorityDurationText" Text="—" FontSize="20" />
+                                </StackPanel>
+                                <TextBlock Grid.Column="2" x:Name="PriorityRunSummary" Text="Not run" Classes="muted" FontSize="11" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+
+                        <Border Classes="card" ClipToBounds="True">
+                            <StackPanel>
+                                <Border Background="#F7F7F8" BorderBrush="#E8E8EA" BorderThickness="0,0,0,1" Padding="18,12">
+                                    <Grid ColumnDefinitions="*,80,100,100,80" ColumnSpacing="12">
+                                        <TextBlock Text="Method" Classes="muted" FontSize="11" />
+                                        <TextBlock Grid.Column="1" Text="Priority" Classes="muted" FontSize="11" />
+                                        <TextBlock Grid.Column="2" Text="Started" Classes="muted" FontSize="11" />
+                                        <TextBlock Grid.Column="3" Text="Duration" Classes="muted" FontSize="11" />
+                                        <TextBlock Grid.Column="4" Text="State" Classes="muted" FontSize="11" />
+                                    </Grid>
+                                </Border>
+                                <ItemsControl x:Name="PriorityWorkerItems">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="models:PriorityWorkerModel">
+                                            <Border Padding="18,18" BorderBrush="#EEEEF0" BorderThickness="0,0,0,1">
+                                                <StackPanel Spacing="12">
+                                                    <Grid ColumnDefinitions="*,80,100,100,80" ColumnSpacing="12">
+                                                        <StackPanel Spacing="5">
+                                                            <TextBlock Text="{Binding Title}" FontSize="13" />
+                                                            <TextBlock Text="{Binding Method}" Classes="muted" FontSize="11" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Method}" />
+                                                        </StackPanel>
+                                                        <TextBlock Grid.Column="1" Text="{Binding Priority}" FontSize="12" VerticalAlignment="Center" />
+                                                        <TextBlock Grid.Column="2" Text="{Binding Start}" FontSize="11" Classes="muted" VerticalAlignment="Center" />
+                                                        <TextBlock Grid.Column="3" Text="{Binding Duration}" FontSize="11" Classes="muted" VerticalAlignment="Center" />
+                                                        <TextBlock Grid.Column="4" Text="{Binding Status}" Foreground="{Binding StatusBrush}" FontSize="12" VerticalAlignment="Center" />
+                                                    </Grid>
+                                                    <TextBlock Text="{Binding Description}" Classes="muted" FontSize="11" TextWrapping="Wrap" />
+                                                    <StackPanel Spacing="6" IsVisible="{Binding HasResult}">
+                                                        <TextBlock Text="{Binding Result}" FontSize="12" TextWrapping="Wrap" />
+                                                        <SelectableTextBlock Text="{Binding Detail}" IsVisible="{Binding HasDetail}" Foreground="#6E6E73" FontSize="11" TextWrapping="Wrap" />
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </StackPanel>
                         </Border>
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Background transactions take about 17 minutes or more. Stop ends the remaining work." Classes="muted" FontSize="11" TextWrapping="Wrap" />
+                            <TextBlock Text="Priority does not guarantee order. Different workloads are not a controlled speed comparison." Classes="muted" FontSize="11" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <TextBlock x:Name="PriorityStatusText" IsVisible="False" Classes="muted" FontSize="12" TextWrapping="Wrap" />
+
+                        <StackPanel x:Name="PriorityHistorySection" IsVisible="False" Spacing="12">
+                            <TextBlock Text="Previous runs" Classes="section" />
+                            <Border Classes="card" Padding="18,0">
+                                <ItemsControl x:Name="PriorityHistoryItems">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="models:PriorityRunRecord">
+                                            <Border BorderBrush="#E8E8EA" BorderThickness="0,0,0,1" Padding="0,12">
+                                                <Grid ColumnDefinitions="40,*,190,110,55" ColumnSpacing="8">
+                                                    <TextBlock Text="{Binding NumberLabel}" Classes="muted" VerticalAlignment="Center" />
+                                                    <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding Time}" Classes="muted" FontSize="12" />
+                                                        <TextBlock Text="{Binding Mode}" Classes="muted" FontSize="11" />
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Column="2" Text="{Binding Outcome}" FontSize="12" VerticalAlignment="Center" />
+                                                    <TextBlock Grid.Column="3" Text="{Binding Duration}" FontSize="12" Classes="muted" VerticalAlignment="Center" />
+                                                    <Button Grid.Column="4" Classes="link" Content="View" Click="OnViewPriorityRunClick" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
+                        </StackPanel>
                     </StackPanel>
 
                     <StackPanel x:Name="GuidePage" IsVisible="False">

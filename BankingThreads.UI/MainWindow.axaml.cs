@@ -30,6 +30,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        InitializePriority();
         foreach (var worker in WorkerModel.Definitions)
             _workers.Add(new WorkerModel(worker.Id, worker.Title, worker.Rate, worker.Symbol, worker.Color));
         WorkerItems.ItemsSource = _workers;
@@ -43,8 +44,11 @@ public partial class MainWindow : Window
             if (!_running) return;
             e.Cancel = true;
             _closeAfterRun = true;
-            StatusText.Text = "Finishing this run before closing…";
+            StatusText.Text = _priorityRunning ? "Stopping priority work before closing…" : "Finishing this run before closing…";
+            if (_priorityRunning) StopPriority();
             StatusText.IsVisible = true;
+            PriorityStatusText.Text = StatusText.Text;
+            PriorityStatusText.IsVisible = true;
         };
     }
 
@@ -77,6 +81,8 @@ public partial class MainWindow : Window
         PriorityNav.Classes.Set("selected", page == "priority");
         GuideNav.Classes.Set("selected", page == "guide");
         BreadcrumbText.Text = page switch { "history" => "History", "priority" => "Scheduling", "guide" => "Notes", _ => "Overview" };
+        NoticeText.Text = string.Empty;
+        UpdateExportState();
     }
 
     private void SetMode(bool synchronized)
@@ -92,8 +98,18 @@ public partial class MainWindow : Window
         RunButton.IsEnabled = RepeatButton.IsEnabled = !running;
         SynchronizedButton.IsEnabled = UnsynchronizedButton.IsEnabled = !running;
         HistoryItems.IsEnabled = !running;
-        RunButtonText.Text = running ? "Running…" : "Run";
-        if (running) StatusText.IsVisible = false;
+        PriorityRunButton.IsEnabled = !running;
+        PriorityModeButton.IsEnabled = !running;
+        PriorityStopButton.IsVisible = running && _priorityRunning;
+        PriorityStopButton.IsEnabled = running && _priorityRunning;
+        PriorityHistoryItems.IsEnabled = !running;
+        RunButtonText.Text = running && !_priorityRunning ? "Running…" : "Run";
+        PriorityRunButtonText.Text = running && _priorityRunning ? "Running…" : "Run";
+        if (running)
+        {
+            StatusText.IsVisible = false;
+            PriorityStatusText.IsVisible = false;
+        }
     }
 
     private void ResetDashboard(int number)
@@ -193,7 +209,7 @@ public partial class MainWindow : Window
     private void UpdateHistory()
     {
         EmptyHistory.IsVisible = _history.Count == 0;
-        ExportButton.IsEnabled = _history.Count > 0;
+        UpdateExportState();
         SessionSummary.Text = $"{_history.Count} {(_history.Count == 1 ? "run" : "runs")}";
     }
 
@@ -208,14 +224,17 @@ public partial class MainWindow : Window
 
     private async void OnExportClick(object? sender, RoutedEventArgs e)
     {
-        if (_history.Count == 0) return;
-        var snapshot = _history.ToArray();
+        bool priority = PriorityPage.IsVisible;
+        if (priority ? _priorityHistory.Count == 0 : _history.Count == 0) return;
+        // Capture the selected kind of session before the user interacts with the save dialog.
+        string csv = priority ? PriorityExport.CreateCsv(_priorityHistory.ToArray())
+            : SessionExport.CreateCsv(_history.ToArray());
         try
         {
             var file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
             {
                 Title = "Export CSV",
-                SuggestedFileName = $"ledger-session-{DateTime.Now:yyyyMMdd-HHmm}.csv",
+                SuggestedFileName = $"ledger-{(priority ? "priority" : "session")}-{DateTime.Now:yyyyMMdd-HHmm}.csv",
                 DefaultExtension = "csv",
                 FileTypeChoices = new[] { new FilePickerFileType("CSV spreadsheet") { Patterns = new[] { "*.csv" } } },
                 ShowOverwritePrompt = true
@@ -226,7 +245,7 @@ public partial class MainWindow : Window
                 await using var stream = await file.OpenWriteAsync();
                 if (stream.CanSeek) stream.SetLength(0);
                 await using var writer = new StreamWriter(stream, new UTF8Encoding(true));
-                await writer.WriteAsync(SessionExport.CreateCsv(snapshot));
+                await writer.WriteAsync(csv);
             }
             NoticeText.Text = "CSV saved";
         }

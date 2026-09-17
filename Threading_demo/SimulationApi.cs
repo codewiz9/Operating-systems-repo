@@ -25,6 +25,13 @@ namespace BankingThreads.Core
         private static readonly object runGate = new object();
         public static decimal StartingBalance => global::Program.StartingBalanceForUi;
 
+        // Expose the three priority workloads without changing the controller file.
+        // They use local data, not the shared balance used by the overview experiments.
+        public static (decimal RemainingBalance, string TransactionHash) VerifySolvencyAndNonce() =>
+            global::Program.VerifySolvencyForUi();
+        public static int CalculateLoanAmortization() => global::Program.CalculateLoanForUi();
+        public static int LowPriorityTransactions() => global::Program.TransactionsForUi();
+
         public static SimulationResult Run(bool synchronized,
             Action<SimulationEvent> progress = null)
         {
@@ -67,6 +74,9 @@ namespace BankingThreads.Core
 partial class Program
 {
     internal static decimal StartingBalanceForUi => starting_balance;
+    internal static (decimal RemainingBalance, string TransactionHash) VerifySolvencyForUi() => VerifySolvencyAndNonce();
+    internal static int CalculateLoanForUi() => CalculateLoanAmortization();
+    internal static int TransactionsForUi() => LowPriorityTransactions();
     internal static decimal ReferenceForUi() => expected_balance();
     internal static decimal RunWorkersForUi(bool synchronized,
         Action<BankingThreads.Core.WorkerUpdate> progress) => Sync_Controller(synchronized, progress);
