@@ -29,7 +29,7 @@ should use Microsoft's Arm64 SDK.
 - **History:** inspect earlier runs from this window's session.
 - **Export CSV:** save summary and event rows, including OS and .NET information.
 - **Notes:** concise definitions and limitations.
-- **Scheduling:** clearly marked pending; the team's `priority_controler` is still empty.
+- **Scheduling:** clearly marked pending in the UI; the console demo runs five named thread priorities.
 
 Runs are sequential at the experiment level because the existing account is static.
 The UI remains responsive while the workers run. Closing during a batch finishes

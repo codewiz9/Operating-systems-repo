@@ -6,7 +6,7 @@ using System.Text;
 using System.Security.Principal;
 
 //the main class for the program
-//each function will have 5 threads except priority function which will have 3 threads
+//each function will have 5 threads, and the priority controller runs five priority levels
 partial class Program
 {
     private static readonly object _ledgerLock = new object(); // Shared lock object; readonly prevents reassignment.
