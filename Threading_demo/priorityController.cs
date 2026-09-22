@@ -3,9 +3,11 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 
-partial class Program
+namespace BankingThreads.Core;
+
+public static class PriorityController
 {
-    protected static (decimal RemainingBalance, string TransactionHash) VerifySolvencyAndNonce()
+    public static (decimal RemainingBalance, string TransactionHash) VerifySolvencyAndNonce()
     {
         decimal current_balance = 5000.00m;
         decimal withdrawal_amount = 1000.00m;
@@ -25,7 +27,7 @@ partial class Program
         return (new_balance, hashHex);
     }
 
-    protected static int CalculateLoanAmortization()
+    public static int CalculateLoanAmortization()
     {
         double principal = 250000.0;
         double annualRate = 0.065;
@@ -44,7 +46,7 @@ partial class Program
         return cpu_laod;
     }
 
-    protected static int LowPriorityTransactions()
+    public static int LowPriorityTransactions()
     {
         Random random = new Random();
         decimal account_balance = 10000.00m;
@@ -61,15 +63,15 @@ partial class Program
         return cpu_laod;
     }
 
-    protected static void priority_controler()
+    public static void Run()
     {
         Action[] calculations =
         {
-            compute_interest,
-            compute_compound_yield,
-            compute_management_fee,
-            compute_cost_of_living_adjustment,
-            compute_tax,
+            Program.compute_interest,
+            Program.compute_compound_yield,
+            Program.compute_management_fee,
+            Program.compute_cost_of_living_adjustment,
+            Program.compute_tax,
         };
 
         string[] names =

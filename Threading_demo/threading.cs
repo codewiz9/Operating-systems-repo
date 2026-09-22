@@ -48,7 +48,7 @@ partial class Program
     }
 
     //Computes I = P * r * t and adds the earned interest
-    protected static void compute_interest(){
+    internal static void compute_interest(){
         //loop to make sure the threads run long enough to simulate concurent activity
         for (int i = 0; i <= 3; i++){
             //calculate the interest (I = P * r for one period)
@@ -62,7 +62,7 @@ partial class Program
         }
     }
     //Computes a 1.5% management fee and subtracts it
-    protected static void compute_management_fee(){
+    internal static void compute_management_fee(){
         //loop to make sure the threads run long enough to simulate concurent activity
         for (int i = 0; i <= 3; i++){
             //calculate the management fee
@@ -76,7 +76,7 @@ partial class Program
         }
     }
     //Computes one period of compound yield: P * (1 + r) - P and adds it
-    protected static void compute_compound_yield(){
+    internal static void compute_compound_yield(){
         //loop to make sure the threads run long enough to simulate concurent activity
         for (int i = 0; i <= 3; i++){
            decimal yield_rate = 0.01m; 
@@ -89,7 +89,7 @@ partial class Program
         }
     }
     //Calculates a 10% tax on the current balance and subtracts it
-    protected static void compute_tax(){
+    internal static void compute_tax(){
         //loop to make sure the threads run long enough to simulate concurent activity
         for (int i = 0; i <= 3; i++){
             //calculate the tax
@@ -103,7 +103,7 @@ partial class Program
         }
     }
     //Calculates a 0.5% cost-of-living adjustment and adds it
-    protected static void compute_cost_of_living_adjustment(){
+    internal static void compute_cost_of_living_adjustment(){
         //loop to make sure the threads run long enough to simulate concurent activity
         for (int i = 0; i <= 3; i++){
             //calculate the cost-of-living adjustment
