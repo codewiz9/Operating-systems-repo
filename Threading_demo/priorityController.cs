@@ -57,7 +57,7 @@ public static class PriorityController
             decimal transaction_amount = random.Next(-5000, 5000);
             account_balance += transaction_amount;
             cpu_laod += 1;
-            Thread.Sleep(10);
+            Thread.Sleep(1);
         }
 
         return cpu_laod;
